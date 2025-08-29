@@ -1,6 +1,7 @@
 import Container from "@/components/container";
 import { GameProps } from "@/utils/types/games";
 import { Input } from "@/components/input";
+import { GameCard } from "@/components/gamecard";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -17,10 +18,20 @@ async function getDalyGame() {
   }
 }
 
+async function GetGamesData(){
+  try{
+    const res = await fetch (`${process.env.NEXT_API_URL}/next-api?api=games`, {next: {revalidate: 20}})
+    return res.json()
+
+  }catch (errr){
+    throw new Error('Failed to fetch data')
+  }
+}
+
 export default async function Home() {
 
 const dalyGame:GameProps = await getDalyGame()
-
+const dataGames:GameProps[] = await GetGamesData()
 
   return (
    
@@ -48,8 +59,14 @@ const dalyGame:GameProps = await getDalyGame()
     </section>
     </Link>
     
-     </Container> 
      <Input/>
+     <h2 className=" text-lg font-bold mt-8 mb-5">Jogos para conhecer</h2>
+     <section className="grid gap-7 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      {dataGames.map( (game) => (
+       <GameCard key={game.id} data={game}/>
+      ))}
+     </section>
+     </Container> 
     </main>
     
   );
