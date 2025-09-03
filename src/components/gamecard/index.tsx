@@ -8,7 +8,7 @@ interface GameCardProps{
     data: GameProps
 }
 
-export function GameCard({data}: GameCardProps ){
+export function GameCard({data}: GameCardProps) {
 
     return(
       <Link href={`/game/${data.id}`}>

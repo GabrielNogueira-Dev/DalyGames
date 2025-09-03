@@ -6,7 +6,7 @@ import Link from 'next/link'
 import {LiaGamepadSolid} from 'react-icons/lia'
 export default function Header() {
 return(
-        <header className="w-full h-28  bg-slate-100 text-black px-2 ">
+        <header className="w-full h-28  bg-slate-200 text-black px-2 ">
         <div className="max-w-screen-xl mx-auto flex justify-center items-center h-28 sm:justify-between">
             <nav className='flex justify-center items-center gap-4'>
                 <Link href={'/'}>

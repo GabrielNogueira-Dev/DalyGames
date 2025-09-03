@@ -4,8 +4,8 @@ import { FormEvent, useState } from "react"
 import { BsSearch } from "react-icons/bs"
 import { useRouter } from "next/navigation"
 
-export function Input(){
-    const [input, setInput] = useState("")
+export function Input({initialValue = ""}: {initialValue?: string}){
+    const [input, setInput] = useState(initialValue)
     const router = useRouter()
 
 function HandleSearch(e:FormEvent){
