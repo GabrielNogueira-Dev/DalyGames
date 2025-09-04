@@ -8,7 +8,7 @@ async function getData(title:string){
 
    try{
     const decodedTitle = decodeURI(title)
-//para nao aparecer codigo entre os espaços
+//PARA NÃO APARECER O CODIGO %20 QUANDO ESCREVE O NOME COM ESPAÇO
     const res = await fetch(`${process.env.NEXT_API_URL}/next-api?api=games&title=${decodedTitle}`, {next: {revalidate: 20}})
     return res.json()
    }catch(err){

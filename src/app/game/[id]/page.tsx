@@ -3,7 +3,29 @@ import { GameProps } from "@/utils/types/games"
 import { redirect } from "next/navigation"
 import Image from "next/image"
 import { Label } from "./components/label"
+import { GameCard } from "@/components/gamecard"
+import { Metadata } from "next"
 
+interface PropsParams {
+  params: {id:string;}
+}
+
+export async function generateMetadata({params}:PropsParams):Promise<Metadata>{
+   const resolvedParams = await params
+     try{
+        const response = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${resolvedParams.id}`,{next: {revalidate: 20}})
+        const data : GameProps = await response.json()
+        return{title:`${data.title} ` ,
+                description: `${data.description.slice(0,100)}...`,
+            openGraph:{
+                title: data.title,
+                images : [data.image_url],
+            } }
+
+    }catch(err){
+        return{title:'Daly Games', description: 'Encontrei seus jogos aqui!'}
+    } 
+}
 
 async function GetData(id:string){
      try{
@@ -14,13 +36,20 @@ async function GetData(id:string){
     } 
 }
 
-export default async function Game({
-params : {id}
-}:{
-    params: {id:string}
-}){
-    
+async function GetGamesSorted(){
+         try{
+        const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game_day`, {cache: "no-store"})
+        return res.json()
+    }catch(err){
+        throw Error('Failed to Fetch data')
+    } 
+}
+
+export default async function Game( props: { params:  {id:string}}){
+    const {id} = await props.params
+
 const data : GameProps = await GetData(id)
+const sortedgame : GameProps = await GetGamesSorted()
 
 if(!data){
     redirect('/')
@@ -28,7 +57,7 @@ if(!data){
 
     return(
         <main className="w-full mt-2 text-black">
-        <div className="bg-black w-full h-80 sm:h-96 relative">
+        <div className="bg-black h-80 sm:h-96 relative">
             <Image
             className="object-cover w-full h-80 sm:h-96 opacity-70 hover:opacity-60"
             src={data.image_url}
@@ -55,8 +84,16 @@ if(!data){
              {data.categories.map((item)=> (
                 <Label data={item} key={item} />// data é para puxar o nome que foi feito na interface do componens/Label
              ))}
-             
             </div>
+
+               <p className="mt-7 mb-2"> <strong>Data de lançamento: {data.release}</strong></p>
+
+                <h2 className="font-bold text-lg mt-7 mb-5">Jogo recomendado</h2>
+                <div>
+                    <GameCard data={sortedgame}/>
+
+                 
+                </div>
         </Container>
         </main>
     )
