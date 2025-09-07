@@ -2,7 +2,6 @@ import Container from "@/components/container";
 
 import Image from "next/image";
 import UserImg from '../../../public/user.png'
-import Link from "next/link";
 import { FaShareAlt } from "react-icons/fa";
 import { Favorite } from "./components/favorite";
 

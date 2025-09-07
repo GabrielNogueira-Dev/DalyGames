@@ -1,10 +1,17 @@
-
+"use client"
 import logoImg from '../../../public/logo.svg'
 import Image from 'next/image'
 import Link from 'next/link'
 
+
 import {LiaGamepadSolid} from 'react-icons/lia'
+
+import { signIn, signOut, useSession } from "next-auth/react";
+
 export default function Header() {
+
+  const {data: session} = useSession()
+  
 return(
         <header className="w-full h-28  bg-slate-200 text-black px-2 ">
         <div className="max-w-screen-xl mx-auto flex justify-center items-center h-28 sm:justify-between">
@@ -22,12 +29,25 @@ return(
               Games
               </Link>
 
+             {session && (
               <Link href={'/profile'}>
               Perfil
               </Link>
+             )}
             </nav>
 
-                <div className='hidden sm:flex justify-center items-center'>
+                <div className='font-bold gap-2 hidden sm:flex justify-center items-center'>
+                {session ? (
+                  < div className='flex gap-1 '> 
+                  <span className='text-black'>Olá</span> <p className='text-orange-600 capitalize'>{session.user?.name}</p>
+                  
+                  <button className='cursor-pointer ml-2'
+                  key={session.expires} onClick={ () => signOut() }> Sair </button>
+                  </div>
+                ): (
+                  <button className='cursor-pointer'
+                  onClick={ () => signIn("google") }> Entrar </button>
+                )}
                 <Link href={'/profile'}>
                 <LiaGamepadSolid size={32} color="#475569"/>
                 </Link>
