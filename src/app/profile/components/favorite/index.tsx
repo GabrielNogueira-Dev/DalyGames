@@ -119,9 +119,9 @@ function normalize(str: string) {
             
           
               <div className="mt-5 flex items-center justify-between">
-                <span>Jogos Favoritos:</span>
+                <span className="font-bold">Jogos Favoritos 👇</span>
                 <button onClick={handleAddGame} >
-                    <p className="font-bold text-white cursor-pointer">Adicionar jogo</p>
+                    <p className="font-bold text-white cursor-pointer">Adicionar jogo 🖋️</p>
                 </button>
             </div >
 
@@ -130,7 +130,7 @@ function normalize(str: string) {
     <span key={index} className="flex items-center gap-1">
       
       <strong onClick={()=>handleGameClick(game)}
-       className="flex items-center gap-1 cursor-pointer hover:scale-105 duration-300 bg-gray-200 text-gray-900 p-1 rounded-md text-sm">
+       className="capitalize flex items-center gap-1 cursor-pointer hover:scale-105 duration-300 bg-gray-200 text-gray-900 p-1 rounded-md text-sm">
         {game}
       <FiDelete
        onClick={e => {
@@ -140,9 +140,6 @@ function normalize(str: string) {
         className="cursor-pointer text-gray-800 hover:text-red-500"
       />
       </strong>
-      
-    
-
     </span>
   ))}
 </div>

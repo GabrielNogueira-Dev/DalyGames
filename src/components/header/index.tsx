@@ -10,7 +10,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 
 export default function Header() {
 
-  const {data: session} = useSession()
+  const {data: session,status} = useSession()
   
 return(
         <header className="w-full h-28  bg-slate-200 text-black px-2 ">
@@ -46,11 +46,30 @@ return(
                   </div>
                 ): (
                   <button className='cursor-pointer'
-                  onClick={ () => signIn("google") }> Entrar </button>
+                  onClick={ () => signIn("google") }> {status === "loading" ? (
+ <span className="flex items-center gap-1">
+                  
+                     {"Aguarde".split("").map((letter, idx) => (
+                      <span
+                        key={idx}
+                        className="inline-block animate-bounce"
+                        style={{ animationDelay: `${idx * 0.1}s` }}
+                      >
+                        {letter}
+                      </span>
+                    ))}
+                           
+                  <span className="block w-1 h-1 bg-black rounded-full animate-bounce" style={{ animationDelay: '0s' }}></span>
+                  <span className="block w-1 h-1 bg-black rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+                  <span className="block w-1 h-1 bg-black rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></span>
+                </span>
+  ) : (
+    'Entrar'
+  )} </button>
                 )}
-                <Link href={'/profile'}>
-                <LiaGamepadSolid size={32} color="#475569"/>
-                </Link>
+                
+                <LiaGamepadSolid className='ml-2' size={32} color="#475569"/>
+                
                 </div>
         </div>
     </header>
