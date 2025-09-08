@@ -1,13 +1,34 @@
+"use client"
+
 import Container from "@/components/container";
 
 import Image from "next/image";
 import UserImg from '../../../public/user.png'
 import { FaShareAlt } from "react-icons/fa";
 import { Favorite } from "./components/favorite";
-
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Profile(){
-    
+    const {data:session, status:sessionStatus} = useSession()
+    const router = useRouter()
+
+    useEffect(() => {
+    if (sessionStatus === "unauthenticated" || !session?.user?.email!) {
+      router.push("/"); // redireciona para home
+    }
+  }, [session, router]);
+
+    if(sessionStatus == "loading"){
+        return(
+            <div className="w-full h-screen flex justify-center items-center text-black">
+                <span className="text-lg">Carregando...</span>
+            </div>
+        )
+
+    }  
+
     return(
         <main className="w-full text-black">
             <Container>
@@ -34,15 +55,7 @@ export default function Profile(){
 
                 <section className="flex flex-wrap gap-5 flex-col md:flex-row">
                     <div className="flex-grow flex-wrap"> 
-                        <Favorite/>
-                    </div>
-
-                     <div className="flex-grow flex-wrap">
-                        <Favorite/>
-                    </div>
-
-                     <div className="flex-grow flex-wrap">
-                        <Favorite/>
+                        {session && <Favorite/>}
                     </div>
                 </section>
 

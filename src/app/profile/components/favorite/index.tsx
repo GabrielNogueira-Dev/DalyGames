@@ -1,11 +1,15 @@
 "use client"
 
 import { FiEdit, FiX } from "react-icons/fi";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { GameProps } from "@/utils/types/games";
 import { FiDelete } from "react-icons/fi";
-
 import { useRouter } from "next/navigation";
+
+import { db } from "@/lib/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { useSession } from "next-auth/react";
+
 
 export function Favorite(){
     const [input, setInput] = useState("")
@@ -13,24 +17,50 @@ export function Favorite(){
     const [games, setGame] = useState<string[]> ([]) 
      const router = useRouter()
 
+    const {data:session} = useSession()
+                            //FIRESTORE
+     useEffect(() => {
+    if(!session?.user?.email)return;
+
+        const loadFavorites = async () => {
+            const docRef = doc(db, "favorites", session.user?.email!)
+            const snapshot = await getDoc(docRef)
+
+           if (snapshot.exists()) {
+      setGame(snapshot.data()?.games || []);
+    }
+  }
+    loadFavorites()
+    },[session])
+
+     
+    async function saveFavorites(newGames: string[]) {
+    if (!session?.user?.email) return;
+      const docRef = doc(db, "favorites", session.user?.email!);
+      await setDoc(docRef, { games: newGames }, { merge: true });
+     
+    };
+   
 
     function handleButton(){
         setShowInput(!showInput)
-
-       
         setInput("")
     }
 
       function handleAddGame() {
         if (input.trim() !== "") {
-            setGame(prev => [...prev, input]) // spread operator
+            const newGames = [...games, input]
+            saveFavorites(newGames) 
+            setGame(newGames) // spread operator
             setInput("")
             
         }
     }
 
     function handleRemoveGame(indexToRemove:number){
-        setGame(prev => prev.filter((game, index) => index !== indexToRemove))
+        const newGames = games.filter((game,index) => index !== indexToRemove)
+        setGame(newGames)
+        saveFavorites(newGames)
     }
 
 
