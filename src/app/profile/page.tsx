@@ -1,7 +1,7 @@
 "use client"
 
 import Container from "@/components/container";
-
+import { Send } from "@/components/send";
 import Image from "next/image";
 import UserImg from '../../../public/user.png'
 import { FaShareAlt } from "react-icons/fa";
@@ -23,7 +23,7 @@ export default function Profile(){
     if(sessionStatus == "loading"){
         return(
             <div className="w-full h-screen flex justify-center items-center text-black">
-                <span className="text-lg">Carregando...</span>
+                <span className="font-bold text-2xl">Carregando...</span>
             </div>
         )
 
@@ -55,7 +55,12 @@ export default function Profile(){
                     configurações
                 </button>
                 <button className="cursor-pointer bg-white px-3 py-2 rounded-lg">
-                    <FaShareAlt size={24} color="black"/>
+                    <FaShareAlt 
+                    onClick={async () => {
+                    if (!session?.user?.email) return
+                    await Send(session.user.email)
+                }}
+                    size={24} color="black"/>
                 </button>
                 </div>
 

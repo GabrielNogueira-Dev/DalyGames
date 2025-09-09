@@ -1,5 +1,5 @@
 "use client"
-
+import toast from 'react-hot-toast';
 import { FiEdit, FiX } from "react-icons/fi";
 import { useState,useEffect } from "react";
 import { GameProps } from "@/utils/types/games";
@@ -53,7 +53,7 @@ export function Favorite(){
             saveFavorites(newGames) 
             setGame(newGames) // spread operator
             setInput("")
-            
+            toast.success("Jogo adicionado aos favoritos!")
         }
     }
 
@@ -61,6 +61,7 @@ export function Favorite(){
         const newGames = games.filter((game,index) => index !== indexToRemove)
         setGame(newGames)
         saveFavorites(newGames)
+         toast.success("Jogo removido dos favoritos!")
     }
 
 
@@ -75,13 +76,14 @@ export function Favorite(){
     const found = data.find(jogo => normalize(jogo.title).includes(normalize(gameName)) );
 
     if (!found){
-        alert("Jogo não encontrado, digite o nome corretamente!")
+        toast.error("Jogo não encontrado, digite o nome corretamente!")
+        
         return
     }
 
     router.push(`/game/${found.id}`)
    }catch(error){
-    alert("Error ao buscar jogo " + error)
+    toast.error("Error ao buscar jogo " + error)
    }
 
 

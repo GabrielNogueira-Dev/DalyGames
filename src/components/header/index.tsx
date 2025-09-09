@@ -3,22 +3,29 @@ import logoImg from '../../../public/logo.svg'
 import Image from 'next/image'
 import Link from 'next/link'
 
-
 import {LiaGamepadSolid} from 'react-icons/lia'
 
 import { signIn, signOut, useSession } from "next-auth/react";
+import { useState } from 'react';
 
 export default function Header() {
 
   const {data: session,status} = useSession()
-  
+  const [isSigningIn, setIsSigningIn] = useState(false) // <--- novo
+
+    const handleSignIn = async () => {
+  setIsSigningIn(true)       // ativa o "Aguarde"
+  await signIn("google")
+  setIsSigningIn(false)      // desativa o "Aguarde" após o signIn
+  }
+
 return(
         <header className="w-full h-28  bg-slate-200 text-black px-2 ">
         <div className="max-w-screen-xl mx-auto flex justify-center items-center h-28 sm:justify-between">
             <nav className='flex justify-center items-center gap-4'>
                 <Link href={'/'}>
                 <Image src={logoImg}
-                alt="Logo da Daly Games"  
+                  alt="Logo da Daly Games"  
                   quality={100}
                   priority={true}
                   className='max-w-full'
@@ -73,5 +80,6 @@ return(
                 </div>
         </div>
     </header>
+    
 )
 }
