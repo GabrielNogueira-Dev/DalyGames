@@ -6,6 +6,12 @@ import { Label } from "./components/label";
 import { GameCard } from "@/components/gamecard";
 import { Metadata } from "next";
 
+type Props = {
+  params: {
+    id: string;
+  };
+};
+
 // Força renderização dinâmica
 export const dynamic = "force-dynamic";
 
@@ -54,12 +60,8 @@ async function GetGamesSorted() {
 }
 
 // Tipagem baseada no estilo usado em [title]
-export default async function Game({
-  params: { id },
-}: {
-  params: { id: string };
-}) {
-  const data: GameProps = await GetData(id);
+export default async function Game({ params }: Props) {
+  const data: GameProps = await GetData(params.id);
   if (!data) redirect("/");
 
   const sortedGamesData = await GetGamesSorted();
