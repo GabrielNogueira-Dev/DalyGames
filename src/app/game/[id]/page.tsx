@@ -6,15 +6,8 @@ import { Label } from "./components/label";
 import { GameCard } from "@/components/gamecard";
 import { Metadata } from "next";
 
-interface PageParams {
-  id: string;
-}
-
-interface PageProps {
-  params: PageParams;
-}
-
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+// Função de metadata
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   try {
     const response = await fetch(
       `${process.env.NEXT_API_URL}/next-api/?api=game&id=${params.id}`,
@@ -23,46 +16,38 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const data: GameProps = await response.json();
 
     return {
-      title: `${data.title}`,
-      description: `${data.description.slice(0, 100)}...`,
+      title: data.title,
+      description: data.description.slice(0, 100) + "...",
       openGraph: {
         title: data.title,
         images: [data.image_url],
       },
     };
-  } catch (err) {
+  } catch {
     return { title: "Daly Games", description: "Encontrei seus jogos aqui!" };
   }
 }
 
+// Funções auxiliares
 async function GetData(id: string) {
-  try {
-    const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${id}`);
-    return res.json();
-  } catch (err) {
-    throw Error("Failed to Fetch data");
-  }
+  const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${id}`);
+  if (!res.ok) throw new Error("Failed to fetch data");
+  return res.json();
 }
 
 async function GetGamesSorted() {
-  try {
-    const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game_day`, { cache: "no-store" });
-    return res.json();
-  } catch (err) {
-    throw Error("Failed to Fetch data");
-  }
+  const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game_day`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch data");
+  return res.json();
 }
 
-export default async function Game({ params }: PageProps) {
+// Página principal
+export default async function Game({ params }: { params: { id: string } }) {
   const { id } = params;
 
   const data: GameProps = await GetData(id);
+  if (!data) redirect("/");
 
-  if (!data) {
-    redirect("/");
-  }
-
-  // Corrige para garantir que sempre seja um array
   const sortedGamesData = await GetGamesSorted();
   const sortedGames: GameProps[] = Array.isArray(sortedGamesData)
     ? sortedGamesData
@@ -75,8 +60,8 @@ export default async function Game({ params }: PageProps) {
           className="object-cover w-full h-80 sm:h-96 opacity-70 hover:opacity-60"
           src={data.image_url}
           alt={data.title}
-          priority={true}
-          fill={true}
+          priority
+          fill
           sizes="(max-width:768px) 100vw, (max-width:1200px) 44vw"
           quality={100}
         />
