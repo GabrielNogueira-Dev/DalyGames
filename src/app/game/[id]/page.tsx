@@ -10,9 +10,9 @@ import { Metadata } from "next";
 export const dynamic = "force-dynamic";
 
 // Metadata
-export async function generateMetadata(props: { params: Promise<{ id: string }> }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   try {
-    const { id } = await props.params;
+    const { id } = params;
     const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${id}`, {
       next: { revalidate: 20 },
     });
@@ -47,8 +47,8 @@ async function GetGamesSorted() {
 }
 
 // Página principal
-export default async function Game(props: { params: Promise<{ id: string }> }) {
-  const { id } = await props.params;
+export default async function Game({ params }: { params: { id: string } }) {
+  const { id } = params;
 
   // Busca o jogo principal
   const data: GameProps = await GetData(id);
