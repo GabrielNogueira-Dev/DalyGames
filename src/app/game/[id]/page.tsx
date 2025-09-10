@@ -46,9 +46,7 @@ export default async function Game({ params }: { params: { id: string } }) {
   if (!data) redirect("/");
 
   const sortedGamesData = await GetGamesSorted();
-  const sortedGames: GameProps[] = Array.isArray(sortedGamesData)
-    ? sortedGamesData
-    : sortedGamesData?.games || [];
+  const sortedGames: GameProps[] = Array.isArray(sortedGamesData) ? sortedGamesData : sortedGamesData?.games || [];
 
   return (
     <main className="w-full mt-2 text-black">
