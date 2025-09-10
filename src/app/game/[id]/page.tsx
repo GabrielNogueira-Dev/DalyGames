@@ -10,13 +10,11 @@ import { Metadata } from "next";
 export const dynamic = "force-dynamic";
 
 // Metadata
-export async function generateMetadata(props: { params: Promise<{ id: string }> }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   try {
-    const { id } = await props.params; // await aqui é crucial
-    const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${id}`, {
+    const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${params.id}`, {
       next: { revalidate: 20 },
     });
-
     if (!res.ok) throw new Error("Failed to fetch metadata");
     const data: GameProps = await res.json();
 
@@ -47,8 +45,8 @@ async function GetGamesSorted() {
 }
 
 // Página principal
-export default async function Game(props: { params: Promise<{ id: string }> }) {
-  const { id } = await props.params; // await necessário para Next.js 15
+export default async function Game({ params }: { params: { id: string } }) {
+  const { id } = params; // ✅ já é um objeto normal
 
   // Busca o jogo principal
   const data: GameProps = await GetData(id);
