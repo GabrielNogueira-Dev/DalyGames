@@ -6,11 +6,19 @@ import { Label } from "./components/label";
 import { GameCard } from "@/components/gamecard";
 import { Metadata } from "next";
 
+
+interface GamePageParams {
+  params: {
+    id: string;
+  };
+}
+
+
 // Força renderização dinâmica
 export const dynamic = "force-dynamic";
 
 // Metadata
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }:GamePageParams  ){
   try {
     const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${params.id}`, {
       next: { revalidate: 20 },
@@ -45,7 +53,7 @@ async function GetGamesSorted() {
 }
 
 // Página principal
-export default async function Game({ params }: { params: { id: string } }) {
+export default async function Game({ params }: GamePageParams) {
   const { id } = params; // ✅ já é um objeto normal
 
   // Busca o jogo principal
