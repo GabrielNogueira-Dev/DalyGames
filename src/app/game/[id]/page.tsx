@@ -9,6 +9,50 @@ import { Metadata } from "next";
 // Força renderização dinâmica
 export const dynamic = "force-dynamic";
 
+// Metadata
+export async function generateMetadata({
+  params: { id },
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
+  try {
+    const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${id}`, {
+      next: { revalidate: 20 },
+    });
+    if (!res.ok) throw new Error("Failed to fetch metadata");
+    const data: GameProps = await res.json();
+
+    return {
+      title: data.title,
+      description: data.description.slice(0, 100) + "...",
+      openGraph: {
+        title: data.title,
+        images: [data.image_url],
+      },
+    };
+  } catch {
+    return {
+      title: "Daly Games",
+      description: "Encontrei seus jogos aqui!",
+    };
+  }
+}
+
+// Funções auxiliares
+async function GetData(id: string) {
+  const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${id}`);
+  if (!res.ok) throw new Error("Failed to fetch game data");
+  return res.json();
+}
+
+async function GetGamesSorted() {
+  const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game_day`, {
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error("Failed to fetch recommended games");
+  return res.json();
+}
+
 // Tipagem baseada no estilo usado em [title]
 export default async function Game({
   params: { id },
@@ -70,46 +114,4 @@ export default async function Game({
   );
 }
 
-// Metadata
-export async function generateMetadata({
-  params: { id },
-}: {
-  params: { id: string };
-}): Promise<Metadata> {
-  try {
-    const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${id}`, {
-      next: { revalidate: 20 },
-    });
-    if (!res.ok) throw new Error("Failed to fetch metadata");
-    const data: GameProps = await res.json();
 
-    return {
-      title: data.title,
-      description: data.description.slice(0, 100) + "...",
-      openGraph: {
-        title: data.title,
-        images: [data.image_url],
-      },
-    };
-  } catch {
-    return {
-      title: "Daly Games",
-      description: "Encontrei seus jogos aqui!",
-    };
-  }
-}
-
-// Funções auxiliares
-async function GetData(id: string) {
-  const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${id}`);
-  if (!res.ok) throw new Error("Failed to fetch game data");
-  return res.json();
-}
-
-async function GetGamesSorted() {
-  const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game_day`, {
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error("Failed to fetch recommended games");
-  return res.json();
-}
