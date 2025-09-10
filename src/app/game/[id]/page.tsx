@@ -6,14 +6,11 @@ import { Label } from "./components/label";
 import { GameCard } from "@/components/gamecard";
 import { Metadata } from "next";
 
-// Função de metadata
+// Metadata
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_API_URL}/next-api/?api=game&id=${params.id}`,
-      { next: { revalidate: 20 } }
-    );
-    const data: GameProps = await response.json();
+    const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${params.id}`, { next: { revalidate: 20 } });
+    const data: GameProps = await res.json();
 
     return {
       title: data.title,
