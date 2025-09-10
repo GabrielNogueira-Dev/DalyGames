@@ -6,17 +6,19 @@ import { Label } from "./components/label";
 import { GameCard } from "@/components/gamecard";
 import { Metadata } from "next";
 
-// Força renderização dinâmica (evita conflitos de tipos no build)
+// Força renderização dinâmica
 export const dynamic = "force-dynamic";
 
 // Metadata
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   try {
-    const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${params.id}`, {
+    const { id } = await params;
+
+    const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${id}`, {
       next: { revalidate: 20 },
     });
-    if (!res.ok) throw new Error("Failed to fetch metadata");
 
+    if (!res.ok) throw new Error("Failed to fetch metadata");
     const data: GameProps = await res.json();
 
     return {
@@ -33,22 +35,21 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 }
 
 // Funções auxiliares
-async function GetData(id: string): Promise<GameProps> {
+async function GetData(id: string) {
   const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${id}`);
   if (!res.ok) throw new Error("Failed to fetch game data");
   return res.json();
 }
 
-// Tipando o retorno para evitar 'never'
-async function GetGamesSorted(): Promise<GameProps[] | { games: GameProps[] }> {
+async function GetGamesSorted() {
   const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game_day`, { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to fetch recommended games");
   return res.json();
 }
 
 // Página principal
-export default async function Game({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default async function Game({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params; // ✅ agora params é awaited
 
   // Busca o jogo principal
   const data: GameProps = await GetData(id);
@@ -56,14 +57,9 @@ export default async function Game({ params }: { params: { id: string } }) {
 
   // Busca jogos recomendados
   const sortedGamesData = await GetGamesSorted();
-
-  // Type guard para garantir que sempre teremos um array
-  let sortedGames: GameProps[] = [];
-  if (Array.isArray(sortedGamesData)) {
-    sortedGames = sortedGamesData;
-  } else if ('games' in sortedGamesData) {
-    sortedGames = sortedGamesData.games;
-  }
+  const sortedGames: GameProps[] = Array.isArray(sortedGamesData)
+    ? sortedGamesData
+    : sortedGamesData?.games || [];
 
   return (
     <main className="w-full mt-2 text-black">
