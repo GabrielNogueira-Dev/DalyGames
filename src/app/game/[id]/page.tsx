@@ -6,7 +6,7 @@ import { Label } from "./components/label";
 import { GameCard } from "@/components/gamecard";
 import { Metadata } from "next";
 
-// Força a renderização dinâmica (resolve conflito de tipos no build)
+// Força renderização dinâmica
 export const dynamic = "force-dynamic";
 
 // Metadata
@@ -48,11 +48,9 @@ async function GetGamesSorted() {
 export default async function Game({ params }: { params: { id: string } }) {
   const { id } = params;
 
-  // Busca o jogo principal
   const data: GameProps = await GetData(id);
   if (!data) redirect("/");
 
-  // Busca jogos recomendados
   const sortedGamesData = await GetGamesSorted();
   const sortedGames: GameProps[] = Array.isArray(sortedGamesData) ? sortedGamesData : sortedGamesData?.games || [];
 
