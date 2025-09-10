@@ -6,6 +6,9 @@ import { Label } from "./components/label";
 import { GameCard } from "@/components/gamecard";
 import { Metadata } from "next";
 
+// Força a renderização dinâmica (evita conflitos de tipos no build)
+export const dynamic = "force-dynamic";
+
 // Metadata
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   try {
