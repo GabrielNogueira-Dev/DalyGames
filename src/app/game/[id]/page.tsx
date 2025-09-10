@@ -6,14 +6,18 @@ import { Label } from "./components/label"
 import { GameCard } from "@/components/gamecard"
 import { Metadata } from "next"
 
-interface PropsParams {
-  params: {id:string;}
+interface PageParams {
+  id: string
 }
 
-export async function generateMetadata({params}:PropsParams):Promise<Metadata>{
-   const resolvedParams =  params
+interface PageProps {
+  params: PageParams
+}
+
+export async function generateMetadata({params}:PageProps):Promise<Metadata>{
+   
      try{
-        const response = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${resolvedParams.id}`,{next: {revalidate: 20}})
+        const response = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${params.id}`,{next: {revalidate: 20}})
         const data : GameProps = await response.json()
         return{title:`${data.title} ` ,
                 description: `${data.description.slice(0,100)}...`,
@@ -45,11 +49,11 @@ async function GetGamesSorted(){
     } 
 }
 
-export default async function Game( props: { params:  {id:string}}){
-    const {id} =  props.params
+export default async function Game({ params }:  PageProps){
+    const {id} =  params
 
 const data : GameProps = await GetData(id)
-const sortedgame : GameProps = await GetGamesSorted()
+const sortedgame : GameProps[] = await GetGamesSorted()
 
 if(!data){
     redirect('/')
@@ -89,11 +93,11 @@ if(!data){
                <p className="mt-7 mb-2"> <strong>Data de lançamento: {data.release}</strong></p>
 
                 <h2 className="font-bold text-lg mt-7 mb-5">Jogo recomendado</h2>
-                <div>
-                    <GameCard data={sortedgame}/>
-
-                 
-                </div>
+                <div className="flex flex-wrap gap-4">
+          {sortedgame.map((game) => (
+            <GameCard key={game.id} data={game} />
+          ))}
+        </div>
         </Container>
         </main>
     )
