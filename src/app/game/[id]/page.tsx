@@ -6,13 +6,16 @@ import { Label } from "./components/label";
 import { GameCard } from "@/components/gamecard";
 import { Metadata } from "next";
 
-// Força a renderização dinâmica (evita conflitos de tipos no build)
+// Força a renderização dinâmica (resolve conflito de tipos no build)
 export const dynamic = "force-dynamic";
 
 // Metadata
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   try {
-    const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${params.id}`, { next: { revalidate: 20 } });
+    const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${params.id}`, {
+      next: { revalidate: 20 },
+    });
+    if (!res.ok) throw new Error("Failed to fetch metadata");
     const data: GameProps = await res.json();
 
     return {
@@ -31,13 +34,13 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 // Funções auxiliares
 async function GetData(id: string) {
   const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${id}`);
-  if (!res.ok) throw new Error("Failed to fetch data");
+  if (!res.ok) throw new Error("Failed to fetch game data");
   return res.json();
 }
 
 async function GetGamesSorted() {
   const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game_day`, { cache: "no-store" });
-  if (!res.ok) throw new Error("Failed to fetch data");
+  if (!res.ok) throw new Error("Failed to fetch recommended games");
   return res.json();
 }
 
@@ -45,9 +48,11 @@ async function GetGamesSorted() {
 export default async function Game({ params }: { params: { id: string } }) {
   const { id } = params;
 
+  // Busca o jogo principal
   const data: GameProps = await GetData(id);
   if (!data) redirect("/");
 
+  // Busca jogos recomendados
   const sortedGamesData = await GetGamesSorted();
   const sortedGames: GameProps[] = Array.isArray(sortedGamesData) ? sortedGamesData : sortedGamesData?.games || [];
 
