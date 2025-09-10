@@ -9,8 +9,15 @@ import { Metadata } from "next";
 // Força renderização dinâmica (resolve conflitos de tipos no build)
 export const dynamic = "force-dynamic";
 
+// Tipagem correta para os parâmetros da rota
+interface GamePageProps {
+  params: {
+    id: string;
+  };
+}
+
 // Metadata
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: GamePageProps): Promise<Metadata> {
   try {
     const { id } = params;
     const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${id}`, {
@@ -47,7 +54,7 @@ async function GetGamesSorted() {
 }
 
 // Página principal
-export default async function Game({ params }: { params: { id: string } }) {
+export default async function Game({ params }: GamePageProps) {
   const { id } = params;
 
   // Busca o jogo principal
