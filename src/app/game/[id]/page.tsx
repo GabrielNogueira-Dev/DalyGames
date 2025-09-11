@@ -17,9 +17,10 @@ type ParamsFix = {
 export const dynamic = "force-dynamic";
 
 // Metadata
-export async function generateMetadata({ params }: ParamsFix): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   try {
-    const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${params.id}`, {
+    const resolvedParams = await params;
+    const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${resolvedParams.id}`, {
       next: { revalidate: 20 },
     });
     if (!res.ok) throw new Error("Failed to fetch metadata");
@@ -41,6 +42,7 @@ export async function generateMetadata({ params }: ParamsFix): Promise<Metadata>
   }
 }
 
+
 // Funções auxiliares
 async function GetData(id: string) {
   const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${id}`);
@@ -57,8 +59,9 @@ async function GetGamesSorted() {
 }
 
 // Página principal
-export default async function Game({ params }: ParamsFix) {
-  const data: GameProps = await GetData(params.id);
+export default async function Game({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  const data: GameProps = await GetData(resolvedParams.id);
   if (!data || !data.id) redirect("/");
 
   const sortedGamesData = await GetGamesSorted();
