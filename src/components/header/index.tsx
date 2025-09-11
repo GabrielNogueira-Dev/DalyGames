@@ -21,7 +21,7 @@ export default function Header() {
 
 return(
         <header className="w-full h-28  bg-slate-200 text-black px-2 ">
-        <div className="max-w-screen-xl mx-auto flex justify-center items-center h-28 sm:justify-between">
+        <div className=" max-w-screen-xl mx-auto flex justify-evenly items-center h-28 sm:justify-between">
             <nav className='flex justify-center items-center gap-4'>
                 <Link href={'/'}>
                 <Image src={logoImg}
@@ -43,7 +43,8 @@ return(
              )}
             </nav>
 
-                <div className='font-bold gap-2 hidden sm:flex justify-center items-center'>
+               <div className='font-bold gap-2 flex justify-center items-center'>
+
                 {session ? (
                   < div className='flex gap-1 '> 
                   <span className='text-black'>Olá</span> <p className='text-orange-600 capitalize'>{session.user?.name}</p>
