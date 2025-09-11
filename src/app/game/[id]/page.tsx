@@ -5,8 +5,9 @@ import Image from "next/image";
 import { Label } from "./components/label";
 import { GameCard } from "@/components/gamecard";
 import { Metadata } from "next";
-
-type Props = {
+//force
+// Tipagem manual para evitar conflito com PageProps
+type ParamsFix = {
   params: {
     id: string;
   };
@@ -16,13 +17,9 @@ type Props = {
 export const dynamic = "force-dynamic";
 
 // Metadata
-export async function generateMetadata({
-  params: { id },
-}: {
-  params: { id: string };
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: ParamsFix): Promise<Metadata> {
   try {
-    const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${id}`, {
+    const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${params.id}`, {
       next: { revalidate: 20 },
     });
     if (!res.ok) throw new Error("Failed to fetch metadata");
@@ -59,10 +56,10 @@ async function GetGamesSorted() {
   return res.json();
 }
 
-// Tipagem baseada no estilo usado em [title]
-export default async function Game({ params }: Props) {
+// Página principal
+export default async function Game({ params }: ParamsFix) {
   const data: GameProps = await GetData(params.id);
-  if (!data) redirect("/");
+  if (!data || !data.id) redirect("/");
 
   const sortedGamesData = await GetGamesSorted();
   const sortedGames: GameProps[] = Array.isArray(sortedGamesData)
@@ -105,7 +102,7 @@ export default async function Game({ params }: Props) {
           <strong>Data de lançamento: {data.release}</strong>
         </p>
 
-        <h2 className="font-bold text-lg mt-7 mb-5">Jogos recomendados</h2>
+        <h2 className="font-bold text-black text-lg mt-7 mb-5">Jogos recomendados</h2>
         <div className="flex flex-wrap gap-4">
           {sortedGames.map((game) => (
             <GameCard key={game.id} data={game} />
@@ -115,5 +112,3 @@ export default async function Game({ params }: Props) {
     </main>
   );
 }
-
-
