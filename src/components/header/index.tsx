@@ -61,7 +61,7 @@ export default function Header() {
           {session ? (
             <div className="flex gap-1 items-center">
               <span>Olá</span>
-              <p className="text-orange-600 ">{session.user?.name}</p>
+              <p className="text-orange-600 capitalize">{session.user?.name}</p>
               <button className="ml-2" onClick={() => signOut()}>Sair</button>
             </div>
           ) : (
@@ -92,7 +92,7 @@ export default function Header() {
 
       {/* Menu mobile */}
         {session && (
-        <div className="sm:hidden text-center font-bold text-orange-600 mt-2">
+        <div className="sm:hidden text-center font-bold text-orange-600 mt-1 mb-2 capitalize">
           Olá {session.user?.name}
         </div>
       )}
